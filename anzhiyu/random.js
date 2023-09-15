@@ -1,0 +1,1 @@
+var posts=["2023/09/15/hello-world/","2023/09/15/学生联合会-社团介绍/"];function toRandomPost(){pjax.loadUrl('/'+posts[Math.floor(Math.random() * posts.length)]);};
