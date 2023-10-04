@@ -1,0 +1,21 @@
+{
+	"name": "星芸AI",
+	"short_name": "星芸AI",
+	"description": "Xing-Yun Chat",
+	"start_url": "./",
+	"display": "standalone",
+	"background_color": "#ffffff",
+	"theme_color": "#000000",
+	"icons": [
+		{
+			"src": "AAA.png",
+			"sizes": "192x192",
+			"type": "image/png"
+		},
+		{
+			"src": "AAA.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		}
+	]
+}

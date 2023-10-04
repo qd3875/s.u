@@ -1,0 +1,22 @@
+{
+	"code": "xyai",
+	"name": "星芸AI",
+	"version": "1.0.0",
+	"author": "星芸",
+	"firstCat": "app",
+	"secondCat": "实用工具",
+	"imgPath": "apps/xyai/icon.png",
+	"descr": "AI智能辅助工具，拥有GPT3.5,GPT4.0,星芸AI自研大模型，文档解析，语音对话，图片识别，Midjourney专业绘图能力。PPT一键生成，拥有沙盒机制的超强的代码解析器功能即将推出，欢迎体验！",
+	"screenShots": "[\"apps/xyai/screenShots/homepage.png\",\"apps/xyai/screenShots/midj.png\",\"apps/xyai/screenShots/code.png\",\"apps/xyai/screenShots/aifile.png\",\"apps/xyai/screenShots/website.png\"]",
+	"effect": "星芸AI，AI人工智能辅助工具\n拥有GPT3.5,GPT4.0,星芸AI自研大模型，文档解析，语音对话，图片识别，Midjourney专业绘图能力。\nPPT一键生成，拥有沙盒机制的超强的代码解析器功能即将推出，欢迎体验！",
+	"rightMenuAddAll": [
+	],
+	"rightMenuOpenWith": [
+	],
+	"rightMenuNew": [
+	],
+	"updateLog": "",
+	"singleton": 1,
+	"exts": {
+	}
+}

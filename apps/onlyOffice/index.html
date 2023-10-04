@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OnlyOffice</title>
+    <script src="js/init.js?from=element&plugins=tabs"></script>
+    <meta name="referrer" content="never">
+    <style>
+        html,body{
+            margin: 0;
+            padding: 0;
+        }
+        .tabs-content.el-tabs {
+            --el-tabs-header-height: 27px;
+        }
+        .tabs-content.el-tabs .el-tabs__header{
+            margin:0px;
+        }
+        .tabs-content.el-tabs.el-tabs--card>.el-tabs__header .el-tabs__nav{
+            /*border-top: none;*/
+            border-radius: 0px;
+        }
+        .el-button-group .el-button{
+            border-radius: 0px;
+        }
+        .tabs-content .el-tabs__item{
+            user-select: none;
+        }
+    </style>
+</head>
+<body style="display: none;">
+<div id="app" style="overflow:hidden;">
+    <div v-if="filePreview.url">
+        <iframe :src="filePreview.url" frameborder="0" style="width:100vw;height:99vh;border:0px;"></iframe>
+    </div>
+    <div v-else :style="{'display':!noAction.show?'':'none'}">
+        <el-tabs
+                v-model="current"
+                type="card"
+                class="tabs-content"
+                @tab-change="changeTabs"
+                closable
+                @tab-remove="removeTabs"
+        >
+            <template v-for="(fileEdit,index) in fileEditList">
+                <el-tab-pane :label="fileEdit.fileData.name" :name="index" v-if="fileEdit.show"></el-tab-pane>
+            </template>
+            <div v-for="(fileEdit,index) in fileEditList" :style="{'display':index==current?'':'none','height':'calc(100vh - 36px)'}">
+                <iframe :src="fileEdit.remoteEditUrl" frameborder="0" style="width:100%;height:100%;"></iframe>
+            </div>
+        </el-tabs>
+    </div>
+    <div v-if="noAction.show">
+        <el-row style="margin-left:10px;margin-top:10px;">
+            <el-col :span="24">
+                <el-tag @click="toOpenBySelect()" style="cursor:pointer;margin-left:10px;">打开...</el-tag>
+                <el-tag @click="clearAll()" style="cursor:pointer;margin-left:10px;">清空</el-tag>
+                <el-tag v-if="user.userType == 1" @click="toSetting()" style="cursor:pointer;margin-left:10px;">配置</el-tag>
+            </el-col>
+            <el-col :span="24" style="margin-top:5px;">
+                <span style="font-size:14px;color:#666;">最近打开</span>
+            </el-col>
+            <el-col :span="24" v-for="item in noAction.history" style="margin-top:10px;">
+                <table @click="toOpenTheFile(item)" style="cursor:pointer;border-spacing:0px;font-size:12px;">
+                    <tr>
+                        <td rowspan="2" style="width:40px;text-align:center;">
+                            <img :src="item.ext=='folder'?'icon.png':item.thumbnail" style="max-width: 40px;max-height: 40px;" alt="" />
+                        </td>
+                        <td style="width:45vw;text-align:left;"><span style="display: inline-block;width: 30vw;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">{{item.name}}</span></td>
+                        <td style="width:calc(55vw - 40px);text-align:left;"><span style="color:#666;">{{item.time}}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><span style="color:#666;display: inline-block;width: 70vw;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">{{item.path}}</span></td>
+                    </tr>
+                </table>
+            </el-col>
+        </el-row>
+        <el-dialog
+                v-model="settings.show"
+                title="配置OnlyOffice"
+                width="410px"
+                :close-on-click-modal="false"
+                :close-on-press-escape="false"
+        >
+            <el-form :model="settings.data" label-width="120px" style="margin-top:10px;">
+                <el-form-item label="密钥">
+                    <el-input v-model="settings.data.jwtKey" style="width:200px;"></el-input>
+                </el-form-item>
+                <el-form-item label="文档外网">
+                    <el-input v-model="settings.data.officeHost" style="width:200px;"></el-input>
+                </el-form-item>
+                <el-form-item label="文档内网">
+                    <el-input v-model="settings.data.officeHostIntranet" style="width:200px;"></el-input>
+                </el-form-item>
+                <el-form-item label="系统内网">
+                    <el-input v-model="settings.data.webosHostIntranet" style="width:200px;"></el-input>
+                </el-form-item>
+                <el-form-item label="">
+                    看不懂?不会安装OnlyOffice?<a href="https://thoughts.teambition.com/share/643fee185995bc0042569326" target="_blank">点我</a>
+                </el-form-item>
+                <el-form-item>
+                    <el-button size="small" type="primary" @click="saveSettings()">保存</el-button>
+                    <el-button size="small" type="primary" @click="checkSettings()">检查</el-button>
+                    <el-button size="small" @click="settings.show = false">取消</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
+    </div>
+</div>
+</body>
+</html>

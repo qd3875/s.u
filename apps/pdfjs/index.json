@@ -1,0 +1,18 @@
+{
+  "code": "pdfjs",
+  "name": "PDF阅读器",
+  "version": "1.0.5",
+  "author": "阿范",
+  "firstCat": "app",
+  "secondCat": "文件增强",
+  "imgPath": "apps/pdfjs/icon.png",
+  "descr": "PDF阅读器",
+  "screenShots": "[]",
+  "effect": "PDF阅读器",
+  "rightMenuAddAll": [],
+  "rightMenuOpenWith": [
+    {"ext": "pdf","icon": "apps/pdfjs/icon.png", "expAction": "open","name": "PDF阅读器打开"}
+  ],
+  "rightMenuNew": [],
+  "updateLog":"优化置顶问题"
+}

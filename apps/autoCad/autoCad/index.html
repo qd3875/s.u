@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=no" />
+    <meta charset="utf-8">
+    <meta name="referrer" content="never">
+    <style>
+        body {
+            margin: 0;
+        }
+        #forgeViewer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            background-color: #F0F8FF;
+        }
+    </style>
+    <title>AutoDesk在线预览</title>
+    <script src="init.js?from=element&plugins=autoCad"></script>
+</head>
+<body>
+<div id="app">
+    <div style="text-align: center;" v-if="status < 3">
+        <el-steps direction="vertical" :active="status" align-center finish-status="success" style="width: 50vw;margin-left: 25vw;margin-top: 10vh;height: 80vh;">
+            <el-step title="下载">
+                <template #description>
+                    <span>从系统下载到浏览器</span>
+                    <div v-if="status>=0">
+                        <p v-if="status>0"><span style="color:green;">当前文件下载成功</span></p>
+                        <p v-else-if="error0"><span style="color:red;">{{error0}}</span> <el-button size="small" @click="getAutoCadFile()">尝试重试</el-button></p>
+                        <p v-else="!error0"><span style="color:orange;">当前正在下载文件,请耐心等待{{jd}}</span></p>
+                    </div>
+                </template>
+            </el-step>
+            <el-step title="上传">
+                <template #description>
+                    <span>从浏览器上传到AutoCad官网</span>
+                    <div v-if="status>=1">
+                        <p v-if="status>1"><span style="color:green;">当前文件上传成功</span></p>
+                        <p v-else-if="error1"><span style="color:red;">{{error1}}</span> <el-button size="small" @click="getAutoCadFile()">尝试重试</el-button></p>
+                        <p v-else="!error1"><span style="color:orange;">当前正在上传,请耐心等待{{jd}}</span></p>
+                    </div>
+                </template>
+            </el-step>
+            <el-step title="转码" description="利用AutoCad进行云端转码">
+                <template #description>
+                    <span>利用AutoCad进行云端转码</span>
+                    <div v-if="status>=2">
+                        <p v-if="status>2"><span style="color:green;">当前文件转码成功</span></p>
+                        <p v-else-if="error2"><span style="color:red;">{{error2}}</span> <el-button size="small" @click="getAutoCadFile()">尝试重试</el-button></p>
+                        <p v-else="!error2"><span style="color:orange;">当前正在转码,请耐心等待{{jd}}</span></p>
+                    </div>
+                </template>
+            </el-step>
+            <el-step title="预览" description="可以查看了"></el-step>
+        </el-steps>
+    </div>
+    <div id="forgeViewer" :style="{'display':status<3&&status>=0?'none':''}"></div>
+</div>
+</body>

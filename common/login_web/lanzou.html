@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>蓝奏云挂载</title>
+  <script src="../smart-ui/boot/utils.js?from=element"></script>
+</head>
+<body>
+<div id="app">
+  <el-form :model="editData" label-width="120px" style="margin-top:20px;">
+    <el-form-item label="Cookie">
+      <el-input type="textarea" v-model="editData.cookie" style="width:200px;"></el-input>
+      <p style="padding:0px 10px;color:#333;">不知道填什么?
+        <a href="https://docs.qq.com/doc/p/f9355db53299356275f8f515c6d50d9a7dc3571b" target="_blank">点我吧</a>
+      </p>
+    </el-form-item>
+    <el-form-item>
+      <el-button type="primary" @click="lanzouLogin()">登录</el-button>
+    </el-form-item>
+  </el-form>
+</div>
+</body>
+<script>
+  Vue.app({
+    data(){
+      return {
+        editData:{
+          cookie:""
+        }
+      }
+    },
+    methods:{
+      lanzouLogin:function (){
+        const that = this;
+        if(!that.editData.cookie){
+            parent.webos.message.error("请填写cookie后重试");
+            return;
+        }
+        parent.postMessage({type:"cookie",data:JSON.stringify(that.editData)},"*");
+      }
+    },
+    mounted:function(){
+    }
+  });
+</script>
+</html>

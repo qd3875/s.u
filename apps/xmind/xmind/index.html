@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html site-mode="cn" mode="production" lang="cn">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="author" content="Xmind Ltd.">
+  <title>Xmind</title>
+  <meta name="keywords" content="xmind,思维导图,xmind官网,思维导图软件,效率工具,头脑风暴,脑图,心智图">
+  <meta name="referrer" content="never">
+  <script>
+    (function (){
+      const searchParams = new URL(window.location.href).searchParams;
+      let url = searchParams.get("url");
+      let name = searchParams.get("name");
+      if(!name){
+        const sz = decodeURIComponent(url).split("/");
+        name = sz[sz.length-1];
+      }
+      const sz = name.split(".");
+      sz.length -= 1;
+      window.fileMainName = sz.join(".");
+      const open = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (...args){
+        if(args[1].startsWith("/_api/share/maps")){
+          args[1] = "https://support.tenfell.cn/webos_update/common/xmind.php?type=1&url="+encodeURIComponent(url)
+        }
+        return open.apply(this,args);
+      }
+    })()
+  </script>
+  <script async src="https://xmind.cn/_api/plsbl/gtag"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'AW-10965905864');
+  </script>
+  <script>(function(w,d,t,r,u){var f,n,i;w[u]=w[u]||[],f=function(){var o={ti:"97027241"};o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")},n=d.createElement(t),n.src=r,n.async=1,n.onload=n.onreadystatechange=function(){var s=this.readyState;s&&s!=="loaded"&&s!=="complete"||(f(),n.onload=n.onreadystatechange=null)},i=d.getElementsByTagName(t)[0],i.parentNode.insertBefore(n,i)})(window,document,"script","bat.js","uetq");</script>
+
+  <link rel="stylesheet" href="bootstrap-customized-f152a280ef.min.css">
+
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="text-autospace-d1ab216252.css">
+  <link href="family.css" rel="stylesheet">
+  <link rel="stylesheet" href="index-6b2f8fa063.css">
+  <script src="jquery-3-c9f5aeeca3.2.1.min.js"></script>
+
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, minimal-ui">
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Xmind思维导图中文官网" />
+  <link rel="stylesheet" href="share-map-9434a87d27.css">
+
+</head>
+<body>
+
+
+<div id="outline" class="d-none">
+</div>
+
+<script>
+  window.manifests = {
+    'snowbrush': 'snowbrush.js',
+    'structureAnimationVideo': 'https://s3.cn-north-1.amazonaws.com.cn/assets.xmind.cn/www/assets/videos/animate/structure-loading-animate-ec6aa8c56e.mp4',
+    'structureAnimationGIF': 'https://s3.cn-north-1.amazonaws.com.cn/assets.xmind.cn/www/assets/videos/animate/structure-loading-animate-08d3b453a2.gif',
+    'facebookIcon': 'https://s3.cn-north-1.amazonaws.com.cn/assets.xmind.cn/www/assets/images/share/facebook-icon-7018f49319.svg',
+    'linkedinIcon': 'https://s3.cn-north-1.amazonaws.com.cn/assets.xmind.cn/www/assets/images/share/linkedin-icon-b71dc66ddd.svg',
+    'twitterIcon': 'https://s3.cn-north-1.amazonaws.com.cn/assets.xmind.cn/www/assets/images/share/twitter-icon-11380ffc4e.svg',
+    'xmindLogo': 'https://s3.cn-north-1.amazonaws.com.cn/assets.xmind.cn/www/assets/images/share/xmind-b6f6b3ca68.svg'
+  };
+  (function (){
+    window.metadataString = "";
+    let count = 0;
+    const xhShow = function (){
+      if(document.querySelector("span.top-left-bar__info-primary")){
+        document.querySelector("span.top-left-bar__info-primary").innerHTML=window.fileMainName;
+        count++;
+      }
+      if(count>3){
+        return;
+      }
+      setTimeout(xhShow,500);
+    }
+    xhShow();
+  })()
+</script>
+<script src="text-autospace-fed758f4a6.min.js"></script>
+<script src="polyfill-45b9836beb.min.js"></script>
+<script src="js-cookie-a978ac7394.js"></script>
+<script src="popper-135fa9e662.min.js"></script>
+<script src="bootstrap-26779614c4.min.js"></script>
+<script src="base.351d21e786.js"></script>
+<script src="vue@2-b0cd066675.7.14.min.js"></script>
+<script src="vue-plugins.c679fbbbd4.js"></script>
+<script src="share-map.bba148ff37.js"></script>
+<!--<script>
+  const url = new URL(window.location.href)
+  const hostname = url.hostname
+  const origin = "https://xmind.cn"
+  script = document.createElement('script')
+  script.src = origin + '/_api/plsbl/js'
+  script.async = 'true'
+  script.defer = 'true'
+  script.dataset.domain = hostname
+  script.dataset.api = origin + '/_api/plsbl/event'
+  document.body.append(script)
+</script>-->
+<style>
+  .share-map-menu__operation{
+    display: none;
+  }
+  .settings-bar .top-right-bar .sheets-bar,
+  .settings-bar .top-right-bar hr.floating-bar__vertical-separator,
+  .settings-bar .top-left-bar .top-left-bar__logo,
+  .settings-bar .top-right-bar .top-right-bar__logo.d-block
+  {
+    display: none !important;
+  }
+</style>
+</body>
+</html>

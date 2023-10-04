@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自动跳转专用</title>
+</head>
+<body>
+</body>
+<script>
+    (function(){
+        var url = new URL(window.location.href);
+        var toUrl = url.searchParams.get("url");
+        window.location.href = toUrl;
+    })()
+</script>
+</html>

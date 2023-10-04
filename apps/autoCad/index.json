@@ -1,0 +1,20 @@
+{
+  "code": "autoCad",
+  "name": "AutoCAD预览",
+  "version": "1.0.8",
+  "author": "阿范",
+  "firstCat": "app",
+  "secondCat": "实用工具",
+  "imgPath": "apps/autoCad/icon.png",
+  "descr": "AutoCAD在线预览",
+  "screenShots": "[]",
+  "effect": "AutoCAD在线预览",
+  "rightMenuAddAll": [
+  ],
+  "rightMenuOpenWith": [
+    {"ext": "3dm,3ds,asm,cam360,catpart,catproduct,cgr,collaboration,dae,dgn,dlv3,dwf,dwfx,dwg,dwt,dxf,exp,f3d,fbx,g,gbxml,iam,idw,ifc,ige,iges,igs,ipt,jt,model,neu,nwc,nwd,obj,prt,rvt,sab,sat,session,skp,sldasm,sldprt,smb,smt,ste,step,stl,stla,stlb,stp,wire,x_b,x_t,xas,xpr","icon": "apps/autoCad/icon.png", "expAction": "open","name": "使用AutoCAD打开"}
+  ],
+  "rightMenuNew": [],
+  "updateLog": "自定义账号",
+  "exts": {"dwf,dwfx":"apps/autoCad/icon/dwf.png"}
+}

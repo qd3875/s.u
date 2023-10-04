@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>alist挂载</title>
+    <script src="../smart-ui/boot/utils.js?from=element"></script>
+</head>
+<body>
+<div id="app">
+    <el-form :model="editData" label-width="120px" style="margin-top:20px;">
+        <el-form-item label="内网地址">
+            <el-input v-model="editData.localHost" placeholder="webos访问alist的地址" style="width:200px;"></el-input>
+        </el-form-item>
+        <el-form-item label="外网地址">
+            <el-input v-model="editData.host" placeholder="浏览器访问alist的地址" style="width:200px;"></el-input>
+        </el-form-item>
+        <el-form-item label="用户名">
+            <el-input v-model="editData.username" placeholder="无账号留空" style="width:200px;"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+            <el-input v-model="editData.password" placeholder="无密码留空" style="width:200px;"></el-input>
+        </el-form-item>
+        <el-form-item label="两步验证密保">
+            <el-input v-model="editData.secret" placeholder="未启用双重验证留空" style="width:200px;"></el-input>
+        </el-form-item>
+        <p style="text-align:center;padding:0px 10px;font-size:12px;color:#666;">没有内网地址的,内网和外网地址填写一样的即可,地址需要时根地址,非根地址可能存在挂载不上的情况</p>
+        <el-form-item>
+            <el-button type="primary" @click="login()">登录</el-button>
+        </el-form-item>
+    </el-form>
+</div>
+</body>
+<script>
+    Vue.app({
+        data(){
+            return {
+                editData:{
+                    localHost:"http://127.0.0.1:5244",
+                    host:"https://",
+                    username:"",
+                    password:"",
+                    secret:""
+                }
+            }
+        },
+        methods:{
+            login:function (){
+                const that = this;
+                for (let key in that.editData){
+                    if(["secret","username","password"].includes(key)){
+                        continue;
+                    }
+                    if(!that.editData[key]){
+                        parent.webos.message.error("参数填写不完整");
+                        return;
+                    }
+                }
+                if(!that.editData.localHost.startsWith("http")){
+                    parent.webos.message.error("内网地址必须以http开头");
+                    return;
+                }
+                if(!that.editData.host.startsWith("http")){
+                    parent.webos.message.error("外网地址必须以http开头");
+                    return;
+                }
+                if(that.editData.localHost.endsWith("/")){
+                    that.editData.localHost = that.editData.localHost.substring(0,that.editData.localHost.length-1);
+                }
+                if(that.editData.host.endsWith("/")){
+                    that.editData.host = that.editData.host.substring(0,that.editData.host.length-1);
+                }
+                parent.postMessage({type:"cookie",data:JSON.stringify(that.editData)},"*");
+            },
+        },
+        mounted:function(){
+        }
+    });
+</script>
+</html>

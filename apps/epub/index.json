@@ -1,0 +1,19 @@
+{
+  "code": "epub",
+  "name": "Epub电子书阅读器",
+  "version": "1.0.7",
+  "author": "阿范",
+  "firstCat": "app",
+  "secondCat": "实用工具",
+  "imgPath": "apps/epub/icon.png",
+  "descr": "Epub电子书阅读器",
+  "screenShots": "[]",
+  "effect": "Epub电子书阅读器",
+  "rightMenuAddAll": [
+  ],
+  "rightMenuOpenWith": [
+    {"ext": "epub","icon": "apps/epub/icon.png", "expAction": "open","name": "使用Epub打开"}
+  ],
+  "rightMenuNew": [],
+  "updateLog":"优化置顶问题"
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>授权跳转页</title>
+</head>
+<body style="display:none;">
+请<a id="action" target="_blank">点我</a>并在新窗口完成授权验证
+</body>
+<script>
+    (function (){
+        const path = location.origin+location.pathname;
+        let urlSearch = new URL(window.location.href).searchParams;
+        if(urlSearch.get("code")){
+            localStorage.setItem("auth_code",urlSearch.get("code"));
+            window.close();
+        }else{
+            let commonUrl = "https://support.tenfell.cn/webos_update/common";
+            localStorage.removeItem("auth_code");
+            let loginUrl = null;
+            let type = urlSearch.get("type");
+            if( type == "onedrive"){
+                loginUrl = commonUrl+"/onedrivelogin.html?rurl="+encodeURIComponent(path);
+            }else if( type == "baidu"){
+                loginUrl = commonUrl+"/baidulogin.html?rurl="+encodeURIComponent(path);
+            }else if( type == "qq"){
+                loginUrl = commonUrl+"/qqlogin.html?rurl="+encodeURIComponent(path);
+            }else if( type == "wx"){
+                loginUrl = commonUrl+"/wxlogin.html?rurl="+encodeURIComponent(path);
+            }else if( type == "autocad"){
+                loginUrl = commonUrl+"/autodesk.html?rurl="+encodeURIComponent(path);
+            }
+            if(!loginUrl){
+                return;
+            }
+            if(urlSearch.get("auto") == "true"){
+                try{
+                    let a = document.createElement("a");
+                    a.href = loginUrl;
+                    a.target = "_blank";
+                    a.click();
+                }catch(e){
+                    
+                }
+                parent.postMessage({type:"loginUrl",action:type,data:loginUrl},"*");
+            }else{
+                document.getElementById("action").href = loginUrl;
+                document.body.style.display = "";
+            }
+            let getCodeFunc = function (){
+                let code = localStorage.getItem("auth_code");
+                if(code){
+                    parent.postMessage({type:"cookie",action:type,data:code},"*");
+                }else{
+                    setTimeout(getCodeFunc,1000);
+                }
+            }
+            getCodeFunc();
+        }
+    })()
+</script>
+</html>

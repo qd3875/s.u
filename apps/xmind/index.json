@@ -1,0 +1,18 @@
+{
+  "code": "xmind",
+  "name": "Xmind预览",
+  "version": "1.0.3",
+  "author": "阿范",
+  "firstCat": "app",
+  "secondCat": "实用工具",
+  "imgPath": "apps/xmind/icon.png",
+  "descr": "Xmind在线预览",
+  "screenShots": "[]",
+  "effect": "Xmind在线预览",
+  "rightMenuAddAll": [
+  ],
+  "rightMenuOpenWith": [
+    {"ext": "xmind","icon": "apps/xmind/icon.png", "expAction": "open","name": "使用Xmind打开"}
+  ],
+  "exts": {"xmind":"apps/xmind/icon.png"}
+}

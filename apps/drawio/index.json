@@ -1,0 +1,25 @@
+{
+  "code": "drawio",
+  "name": "drawio",
+  "version": "1.0.7",
+  "author": "阿范",
+  "firstCat": "app",
+  "secondCat": "文件增强",
+  "imgPath": "apps/drawio/icon.png",
+  "descr": "流程图工具",
+  "screenShots": "[]",
+  "effect": "流程图工具",
+  "rightMenuAddAll": [],
+  "rightMenuOpenWith": [
+    {"ext": "drawio,vsd,vsdx,vdx,graphml,pos,dio","icon": "apps/drawio/icon.png","expAction": "open","name": "Drawio打开"},
+    {"ext": "drawio,vsd,vsdx,vdx,graphml,pos,dio","icon": "apps/drawio/icon.png","expAction": "edit","name": "Drawio编辑"}
+  ],
+  "rightMenuNew": [
+    {"ext": "drawio","icon": "apps/drawio/icon.png", "expAction": "new","name": "Drawio流程图"}
+  ],
+  "updateLog":"首发",
+  "singleton":1,
+  "exts": {
+    "drawio,vsd,vsdx,vdx,graphml,pos,dio":"apps/drawio/icon.png"
+  }
+}

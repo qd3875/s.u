@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cloudreve挂载</title>
+  <script src="../smart-ui/boot/utils.js?from=element"></script>
+</head>
+<body>
+<div id="app">
+  <el-form :model="editData" label-width="120px" style="margin-top:20px;">
+    <el-form-item label="内网地址">
+      <el-input v-model="editData.localHost" style="width:200px;"></el-input>
+    </el-form-item>
+    <el-form-item label="外网地址">
+      <el-input v-model="editData.host" style="width:200px;"></el-input>
+    </el-form-item>
+    <el-form-item label="登录类型">
+      <el-select v-model="type" placeholder="登录类型" style="width:200px;">
+        <el-option label="账号密码" :value="1"></el-option>
+        <el-option label="Cookie" :value="2"></el-option>
+      </el-select>
+    </el-form-item>
+    <el-form-item label="用户名" v-if="type == 1">
+      <el-input v-model="editData.username" style="width:200px;"></el-input>
+    </el-form-item>
+    <el-form-item label="密码" v-if="type == 1">
+      <el-input v-model="editData.password" style="width:200px;"></el-input>
+    </el-form-item>
+    <el-form-item label="Cookie" v-if="type == 2">
+      <el-input type="textarea" v-model="editData.cookie" style="width:200px;"></el-input>
+      <p style="padding:0px 10px;color:#333;">不知道填什么?
+        <a href="https://docs.qq.com/doc/p/1d50045741f0fa2e6196ef63d7fef332c94db180" target="_blank">点我吧</a>
+      </p>
+    </el-form-item>
+
+    <el-form-item label="预览限制(KB)">
+      <el-input v-model="editData.limitThumbnail" style="width:200px;"></el-input>
+    </el-form-item>
+    <el-form-item>
+      <el-button type="primary" @click="cloudreveLogin()">登录</el-button>
+    </el-form-item>
+  </el-form>
+</div>
+</body>
+<script>
+  Vue.app({
+    data(){
+      return {
+        editData:{
+          localHost:"",
+          host:"",
+          username:"",
+          password:"",
+          cookie:"",
+          limitThumbnail:"1024"
+        },
+        type:1
+      }
+    },
+    methods:{
+      getAbsoluteUrl:function(module, action){
+        const that = this;
+        if(!that.ajaxHostUrl){
+          const host = localStorage.getItem("webosApiHost");
+          that.ajaxHostUrl = host+"/webos/api";
+        }
+        return that.ajaxHostUrl+"?module=" + module + "&action=" + action;
+      },
+      splits:function (str,...args){
+        let sz = [str.trim()];
+        for (let i = 0; i < args.length; i++) {
+          let tmp = args[i];
+          let tmpsz = [];
+          for (let j = 0; j < sz.length; j++) {
+            tmpsz = tmpsz.concat(sz[j].trim().split(tmp));
+          }
+          sz = tmpsz;
+        }
+        for (let i = 0; i < sz.length; i++) {
+          sz[i] = sz[i].trim();
+        }
+        return sz;
+      },
+      checkUrl:function (url,name){
+        let urlFlag = false;
+        if(url.toLowerCase().startsWith("http:") || url.toLowerCase().startsWith("https:")){
+          urlFlag = true;
+        }
+        if(!urlFlag){
+          parent.webos.message.error(name+"请使用http:或者https:开头");
+          return false;
+        }
+        return true;
+      },
+      cloudreveLogin:function (){
+        const that = this;
+        if(!that.editData.host){
+          parent.webos.message.error("外网地址不可为空");
+          return;
+        }
+        if(!that.checkUrl(that.editData.host,"外网地址")){
+          return;
+        }
+        if(that.editData.localHost){
+          if(!that.checkUrl(that.editData.localHost,"内网地址")){
+            return;
+          }
+        }
+        const toLogin = async function (){
+          if(that.type == 2){
+            if(!that.editData.cookie){
+              parent.webos.message.error("请填写cookie后重试");
+              return;
+            }
+            that.editData.username = "";
+            that.editData.password = "";
+            parent.postMessage({type:"cookie",data:JSON.stringify(that.editData)},"*");
+            return;
+          }
+          const body = {
+            userName:that.editData.username,
+            captchaCode:"",
+            Password:that.editData.password
+          }
+          if(that.editData.host.endsWith("/")){
+            that.editData.host = that.editData.host.substring(0,that.editData.host.length-1);
+          }
+          if(that.editData.localHost && that.editData.localHost.endsWith("/")){
+            that.editData.localHost = that.editData.localHost.substring(0,that.editData.localHost.length-1);
+          }
+          //url,method,headerMap,data,cdx,resHeaderMap,progress,responseType,clear
+          const xhr = await parent.webos.request.proxy(that.editData.localHost+"/api/v3/user/session","POST",
+                  {"Content-Type":"application/json"},body,null,{"set-cookie":"my-set-cookie"});
+          const res = JSON.parse(xhr.responseText);
+          if(res.code != 0){
+            parent.webos.message.error(res.msg);
+            return;
+          }
+          const str= xhr.getResponseHeader("my-set-cookie");
+          let sz = that.splits(str,";",",");
+          let cookie = "";
+          for (let i = 0; i < sz.length; i++) {
+            let one = sz[i];
+            if(one.startsWith("cloudreve-session=")){
+              cookie += one+";";
+            }
+          }
+          if(!cookie){
+            parent.webos.message.error("cookie获取失败");
+            return;
+          }
+          that.editData.cookie = cookie;
+          parent.postMessage({type:"cookie",data:JSON.stringify(that.editData)},"*");
+        }
+        if(location.protocol == "https:" && that.editData.host.toLowerCase().startsWith("http:")){
+          utils.$.confirm("检测到当前协议是https,填写的地址是http,将会导致很多功能不可用,确认继续?",function (flag){
+            if(!flag){
+              return;
+            }
+            toLogin();
+          })
+        }else{
+          toLogin();
+        }
+      }
+    },
+    mounted:function(){
+    }
+  });
+</script>
+</html>

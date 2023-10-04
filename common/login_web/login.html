@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>通用账号登录</title>
+    <script src="../smart-ui/boot/utils.js?from=element"></script>
+</head>
+<body>
+<div id="app">
+    <el-form :model="editData" label-width="120px" style="margin-top:20px;">
+
+        <el-form-item :label="field.name" v-for="field in sz">
+            <el-input v-model="editData[field.key]" style="width:200px;"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="panLogin()">登录</el-button>
+        </el-form-item>
+    </el-form>
+</div>
+</body>
+<script>
+    Vue.app({
+        data(){
+            return {
+                editData:{
+                },
+                sz:[]
+            }
+        },
+        methods:{
+            init:function (){
+                this.sz = JSON.parse(new URL(window.location.href).searchParams.get("fields"));
+            },
+            panLogin:function (){
+                parent.postMessage({type:"cookie",data:JSON.stringify(this.editData)},"*");
+            }
+        },
+        mounted:function(){
+            this.init();
+        }
+    });
+</script>
+</html>

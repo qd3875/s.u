@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>天翼云盘</title>
+    <script src="../smart-ui/boot/utils.js?from=element"></script>
+</head>
+<body></body>
+<script>
+    (function (){
+        const webosHost = localStorage.getItem("webosApiHost");
+        let ajaxHostUrl = webosHost+"/webos/api";
+        utils.getAbsoluteUrl = function(module, action){
+            return ajaxHostUrl+"?module=" + module + "&action=" + action;
+        };
+        (function(){
+            const host = window.location.hostname;
+            let send = XMLHttpRequest.prototype.send;
+            XMLHttpRequest.prototype.send = function (...args){
+                const that = this;
+                that.onreadystatechange2 = that.onreadystatechange;
+                that.onreadystatechange = function (){
+                    let over = false;
+                    if(that.readyState == 4){
+                        try{
+                            let resData = JSON.parse(that.responseText);
+                            let toUrl = resData.redirectUrl?resData.redirectUrl:resData.toUrl;
+                            if(toUrl){
+                                over = true;
+                                let url2 = utils.getAbsoluteUrl("proxy","http")+"&url="+encodeURIComponent(btoa(toUrl))+"&expHeader="+encodeURIComponent(btoa("Referer:https://open.e.189.cn"))+"&resHeader="+encodeURIComponent(btoa("set-cookie:my-set-cookie"));
+                                fetch(url2).then(function (res){
+                                    let cookieStr = res.headers.get("my-set-cookie");
+                                    let cookies = cookieStr.split(";");
+                                    for (let i = 0; i < cookies.length; i++) {
+                                        let cookie = cookies[i];
+                                        if(cookie.indexOf("COOKIE_LOGIN_USER")!=-1){
+                                            parent.postMessage({type:"cookie",data:cookie},"*");
+                                            break;
+                                        }
+                                    }
+                                });
+                            }
+                        }catch (e){
+
+                        }
+                    }
+                    if(!over){
+                        that.onreadystatechange2();
+                    }
+                }
+                return send.apply(this,args);
+            }
+            let open = XMLHttpRequest.prototype.open;
+            XMLHttpRequest.prototype.open = function(...args){
+                let url = args[1];
+                if(url.indexOf(host+"/api/")!=-1){
+                    url = url.replace(host,"open.e.189.cn");
+                    args[1] = url;
+                }
+                if(url.startsWith("https://open.e.189.cn/api")){
+                    args[1] = utils.getAbsoluteUrl("proxy","http")+"&url="+encodeURIComponent(btoa(url))+"&header="+encodeURIComponent(btoa("content-type;reqid;cookie;lt"))+"&expHeader="+encodeURIComponent(btoa("referer:https://open.e.189.cn;origin:https://open.e.189.cn"));
+                }
+                return open.apply(this,args);
+            }
+        })();
+        (async function (){
+            let url = "https://cloud.189.cn/api/portal/loginUrl.action?redirectURL=https%3A%2F%2Fcloud.189.cn%2Fweb%2Fredirect.html";
+            let xhr = await parent.webos.request.proxy(url,"GET",
+                {
+                    "referer":"https://cloud.189.cn/web/login.html"
+                },null,null,
+                {
+                    location:"location"
+                },
+                null,null,1
+            );
+            let realUrl = xhr.getResponseHeader("location");
+            xhr = await parent.webos.request.proxy(realUrl,"GET",
+                {
+                },null,null,
+                {
+                    location:"location"
+                },
+                null,null,null
+            );
+            realUrl = xhr.getResponseHeader("location");
+            let tmpUrl = new URL(realUrl);
+            xhr = await parent.webos.request.proxy(realUrl,"GET",
+                {
+                },null,null,
+                {
+                },
+                null,null,null
+            );
+            let html = xhr.responseText;
+            history.pushState("","",tmpUrl.pathname+tmpUrl.search)
+            if(html.includes("/web/main/")){
+                localStorage.removeItem("apm_uid");
+                localStorage.removeItem("apm_sid");
+                localStorage.removeItem("apm_ua");
+                localStorage.removeItem("apm_ct");
+                localStorage.removeItem("apm_ip");
+                utils.delCookie("apm_uid");
+                utils.delCookie("apm_sid");
+                utils.delCookie("apm_ua");
+                utils.delCookie("apm_ct");
+                utils.delCookie("apm_ip");
+                document.write("<body>检测到当前服务器访问天翼云盘频繁,请稍后重试!</body>");
+                return;
+            }
+            document.write(html);
+        })();
+    })();
+</script>
+</html>

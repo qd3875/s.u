@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>百度挂载</title>
+    <script src="../smart-ui/boot/utils.js?from=element"></script>
+</head>
+<body>
+<div id="app">
+    <el-form :model="editData" label-width="120px" style="margin-top:20px;">
+        <el-form-item label="token">
+            <el-input v-model="editData.code" style="width:200px;"></el-input>
+            <el-button size="small" type="primary" @click="getToken()" style="margin-left:5px;">获取</el-button>
+        </el-form-item>
+        <el-form-item label="直链下载">
+            <el-switch v-model="editData.gsDown" :active-value="1" :inactive-value="2"></el-switch>
+            <p v-if="editData.gsDown == 1" style="padding:0px 10px;color:#333;">直连下载采用了个人版文件转存到企业版,请先手动
+                <a href="https://pan.baidu.com/disk/cert" target="_blank">开通企业版</a>
+            </p>
+        </el-form-item>
+        <el-form-item v-if="editData.gsDown == 1" label="自动删除">
+            <el-switch v-model="editData.delDown" :active-value="1" :inactive-value="2"></el-switch>
+            <p v-if="editData.delDown == 1" style="padding:0px 10px;color:#333;">当可用空间小于5G时,文件将从企业网盘删除</p>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="login()">登录</el-button>
+        </el-form-item>
+    </el-form>
+    <iframe :src="iframeUrl" frameborder="0" style="display:none;"></iframe>
+</div>
+</body>
+<script>
+    Vue.app({
+        data(){
+            return {
+                editData:{
+                    code:"",
+                    gsDown:2,
+                    delDown:2
+                },
+                iframeUrl:""
+            }
+        },
+        methods:{
+            login:function (){
+                const that = this;
+                for (let key in that.editData){
+                    if(!that.editData[key]){
+                        parent.webos.message.error("参数填写不完整");
+                        return;
+                    }
+                }
+                parent.postMessage({type:"cookie",data:JSON.stringify(that.editData)},"*");
+            },
+            getToken:function (){
+                this.iframeUrl = "getcode.html?type=baidu&auto=true&_="+Date.now();
+            }
+        },
+        mounted:function(){
+            const that = this;
+            window.addEventListener("message",function (e){
+                if(e.data){
+                    let data = e.data;
+                    if(data.type == "loginUrl"){
+                        let a = document.createElement("a");
+                        a.href = data.data;
+                        a.target = "_blank";
+                        a.click();
+                    }else if(data.type == "cookie"){
+                        that.editData.code = data.data;
+                    }
+                }
+            });
+        }
+    });
+</script>
+</html>

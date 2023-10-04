@@ -1,0 +1,53 @@
+
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>AutoDesk在线预览</title>
+    <script src="js/init.js?from=element&plugins=autoCad"></script>
+    <meta name="referrer" content="never">
+    <style>
+        html,body,#app,.autocad-con,#autocad-div{
+            margin: 0;
+            padding:0;
+            height:100%;
+            width:100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body style="display:none;">
+<div id="app">
+    <div v-if="!noAction.show" class="autocad-con">
+        <iframe id="autocad-div" :src="iframeSrc" frameborder="0"></iframe>
+    </div>
+    <div v-if="noAction.show">
+        <el-row style="margin-left:10px;margin-top:10px;">
+            <el-col :span="24">
+                <el-tag @click="toOpenBySelect()" style="cursor:pointer;margin-left:10px;">打开...</el-tag>
+                <el-tag @click="clearAll()" style="cursor:pointer;margin-left:10px;">清空</el-tag>
+                <el-tag @click="selectCadPanPath()" style="cursor:pointer;margin-left:10px;">AutoCad配置</el-tag>
+            </el-col>
+            <el-col :span="24" style="margin-top:5px;">
+                <span style="font-size:14px;color:#666;">最近打开</span>
+            </el-col>
+            <el-col :span="24" v-for="item in noAction.history" style="margin-top:10px;">
+                <table @click="toOpenTheFile(item)" style="cursor:pointer;border-spacing:0px;font-size:12px;">
+                    <tr>
+                        <td rowspan="2" style="width:40px;text-align:center;">
+                            <img :src="item.ext=='folder'?'icon.png':item.thumbnail" style="max-width: 40px;max-height: 40px;" alt="" />
+                        </td>
+                        <td style="width:45vw;text-align:left;"><span style="display: inline-block;width: 30vw;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">{{item.name}}</span></td>
+                        <td style="width:calc(55vw - 40px);text-align:left;"><span style="color:#666;">{{item.time}}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><span style="color:#666;display: inline-block;width: 70vw;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">{{item.path}}</span></td>
+                    </tr>
+                </table>
+            </el-col>
+        </el-row>
+    </div>
+</div>
+</body>
+</html>

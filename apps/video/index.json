@@ -1,0 +1,30 @@
+{
+  "code": "video",
+  "name": "视频播放器",
+  "version": "1.2.0",
+  "author": "阿范",
+  "firstCat": "app",
+  "secondCat": "文件增强",
+  "imgPath": "apps/video/icon.png",
+  "descr": "视频播放器",
+  "screenShots": "[]",
+  "effect": "视频播放器",
+  "rightMenuAddAll": [
+    {"ext": "mp4,ogg,webm,flv,m3u8,mpd,torrent,mkv,mov,m3u8x,m4v,ts,rmvb,avi,wmv","icon": "apps/video/icon.png", "expAction": "playlist","name": "视频播放器列表"}
+  ],
+  "rightMenuOpenWith": [
+    {"ext": "mp4,ogg,webm,flv,m3u8,mpd,torrent,mkv,mov,m3u8x,m4v,ts,rmvb,avi,wmv","icon": "apps/video/icon.png", "expAction": "open","name": "视频播放器播放"},
+    {"ext": "mp4,ogg,webm,flv,m3u8,mpd,torrent,mkv,mov,m3u8x,m4v,ts,rmvb,avi,wmv","icon": "apps/video/imgs/potplayer.png", "expAction": "potplayer","name": "本地PotPlayer播放"},
+    {"ext": "mp4,ogg,webm,flv,m3u8,mpd,torrent,mkv,mov,m3u8x,m4v,ts,rmvb,avi,wmv","icon": "apps/video/imgs/vlc.png", "expAction": "vlc","name": "本地VLC播放"},
+    {"ext": "mp4,ogg,webm,flv,m3u8,mpd,torrent,mkv,mov,m3u8x,m4v,ts,rmvb,avi,wmv","icon": "apps/video/imgs/iina.png", "expAction": "iina","name": "本地Iina播放"},
+    {"ext": "mp4,ogg,webm,flv,m3u8,mpd,torrent,mkv,mov,m3u8x,m4v,ts,rmvb,avi,wmv","icon": "apps/video/imgs/mxplayer.png", "expAction": "mxplayer","name": "本地MxPlayer播放"},
+    {"ext": "mp4,ogg,webm,flv,m3u8,mpd,torrent,mkv,mov,m3u8x,m4v,ts,rmvb,avi,wmv","icon": "apps/video/imgs/nplayer.png", "expAction": "nplayer","name": "本地NpPlayer播放"},
+    {"ext": "mp4,ogg,webm,flv,m3u8,mpd,torrent,mkv,mov,m3u8x,m4v,ts,rmvb,avi,wmv","icon": "apps/video/imgs/mpv.png", "expAction": "mpvplayer","name": "本地MpvPlayer播放"}
+  ],
+  "rightMenuNew": [],
+  "updateLog":"",
+  "singleton":1,
+  "exts": {
+    "srt,vtt,ass":"apps/video/subtitle.png"
+  }
+}

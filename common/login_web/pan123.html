@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>123挂载</title>
+    <script src="../smart-ui/boot/utils.js?from=element"></script>
+</head>
+<body>
+<div id="app">
+    <el-form :model="editData" label-width="120px" style="margin-top:20px;">
+        <el-form-item label="账号">
+            <el-input v-model="editData.username" style="width:200px;"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+            <el-input v-model="editData.password" style="width:200px;"></el-input>
+        </el-form-item>
+        <el-form-item label="API类型">
+            <el-select v-model="editData.api" placeholder="API类型" style="width:200px;">
+                <el-option label="A" value="a"></el-option>
+                <el-option label="B" value="b"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="登录类型">
+            <el-select v-model="editData.type" placeholder="登录类型" style="width:200px;">
+                <el-option label="账号" :value="1"></el-option>
+                <el-option label="邮箱" :value="2"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="login()">登录</el-button>
+        </el-form-item>
+    </el-form>
+</div>
+</body>
+<script>
+    Vue.app({
+        data(){
+            return {
+                editData:{
+                    username:"",
+                    password:"",
+                    type:1
+                }
+            }
+        },
+        methods:{
+            login:function (){
+                const that = this;
+                for (let key in that.editData){
+                    if(!that.editData[key]){
+                        parent.webos.message.error("参数填写不完整");
+                        return;
+                    }
+                }
+                parent.postMessage({type:"cookie",data:JSON.stringify(that.editData)},"*");
+            },
+        },
+        mounted:function(){
+        }
+    });
+</script>
+</html>

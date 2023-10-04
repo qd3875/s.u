@@ -1,0 +1,23 @@
+{
+  "code": "photopea",
+  "name": "在线PS",
+  "version": "1.0.7",
+  "author": "阿范",
+  "firstCat": "app",
+  "secondCat": "图形软件",
+  "imgPath": "apps/photopea/icon.png",
+  "descr": "在线PS",
+  "screenShots": "[]",
+  "effect": "在线PS",
+  "rightMenuAddAll": [
+  ],
+  "rightMenuOpenWith": [
+    {"ext": "psd,ai,xd,sketch,xcf,raw,dds","icon": "apps/photopea/icon.png", "expAction": "open","name": "使用在线PS打开"},
+    {"ext": "psd,ai,xd,sketch,xcf,raw,jpg,jpeg,png,gif,svg,tiff,dds","icon": "apps/photopea/icon.png", "expAction": "edit","name": "使用在线PS编辑"}
+  ],
+  "rightMenuNew": [
+    {"ext": "psd","icon": "imgs/file_icon/psd.png", "expAction": "new","name": "PSD文件"}
+  ],
+  "updateLog":"优化置顶问题",
+  "singleton":1
+}

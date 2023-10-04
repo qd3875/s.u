@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>腾飞Office</title>
+    <meta name="referrer" content="never">
+    <script src="js/init.js?from=element&plugins=office"></script>
+    <style>
+        .ext-pane{
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 9999;
+        }
+        .link-pane{
+            cursor: pointer;
+            top: -6px;
+            width: 21px;
+            height: 21px;
+            position: relative;
+            display: inline-block;
+        }
+        .side-pane{
+            position: relative;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1bd31b;
+            display: inline-block;
+        }
+        .side-pane.save-ing{
+            background:#00ff00;
+        }
+        .side-pane.save-error{
+            background: #ff1616;
+        }
+        
+    </style>
+</head>
+<body>
+
+<div class="ext-pane">
+    <div id="link-btn" class="link-pane" onclick="openExt()">
+        <svg class="icon" style="vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5894"><path d="M597.333333 213.333333a42.666667 42.666667 0 1 1 0-85.333333h256a42.666667 42.666667 0 0 1 42.666667 42.666667v256a42.666667 42.666667 0 1 1-85.333333 0V273.664l-396.501334 396.501333a42.666667 42.666667 0 0 1-60.330666-60.330666L750.336 213.333333H597.333333zM128 298.666667a85.333333 85.333333 0 0 1 85.333333-85.333334h213.333334a42.666667 42.666667 0 1 1 0 85.333334H213.333333v512h512v-213.333334a42.666667 42.666667 0 1 1 85.333334 0v213.333334a85.333333 85.333333 0 0 1-85.333334 85.333333H213.333333a85.333333 85.333333 0 0 1-85.333333-85.333333V298.666667z" fill="#0D0D0D" p-id="5895"></path></svg>
+    </div>
+    <div id="save-btn" class="side-pane"></div>
+</div>
+</body>
+<script>
+    (async function (){
+        await new Promise(function(success){
+            utils.delayAction(function(){
+                return window && window.webos;
+            },function(){
+                success();
+            });
+        });
+        //type 1文件预览 2非阿里云盘 3阿里云盘
+        //文件预览 url
+        //非阿里云盘 path,fname,expAction
+        //阿里云盘 wpsToken,wpsRefreshToken,wpsUrl
+        let type = 2;
+        const param = new URL(window.location.href).searchParams;
+        let fileUrl = null;
+        let path = param.get("path");
+        let ext = param.get("ext");
+        let expAction = param.get("expAction");
+        const fname = param.get("fname");
+        let name = fname;
+        let isEdit = false;
+        if(!path){
+            if(param.get("wpsToken")){
+                type = 3;
+            }else if(param.get("url")){
+                type = 1;
+                fileUrl = param.get("url");
+                const sz = decodeURIComponent(fileUrl).split("/");
+                name = sz[sz.length-1];
+                path = fileUrl;
+            }
+        }else{
+            fileUrl = await webos.fileSystem.zl(path);
+            isEdit = !path.startsWith("{sio:")&&param.get("expAction")=="edit";
+        }
+        let webosUrl = localStorage.getItem("webos_wps_webosUrl");
+        let alipanPath = localStorage.getItem("webos_wps_alipanPath");
+        if(!webosUrl || !alipanPath){
+            webosUrl = localStorage.getItem("webos_wps_webosUrl_common");
+            alipanPath = localStorage.getItem("webos_wps_alipanPath_common");
+        }
+        if(!webosUrl || !alipanPath){
+            const data = await fetch("https://support.tenfell.cn/wps_token/webosoffice.php").then(function (res){return res.json();});
+            webosUrl = data["webosUrl"];
+            alipanPath = data["aliPath"];
+            localStorage.setItem("webos_wps_webosUrl_common",webosUrl);
+            localStorage.setItem("webos_wps_alipanPath_common",alipanPath);
+        }
+        if(!webosUrl){
+            webos.message.error("当前未配置阿里云盘服务,请指定阿里云盘服务");
+            return;
+        }
+        let wpsData = {};
+        let fileSize = -1;
+        window.wpsUtils = {
+            webosMethod:function (method,param){
+                return fetch(webosUrl+"/"+method,{
+                    method: 'POST',
+                    body: JSON.stringify(param),
+                    headers: {
+                        "content-type":"application/json;charset=utf-8"
+                    }
+                }).then(function (res){
+                    return res.json()
+                });
+            },
+            uploadPre:function (p1,p2,p3){
+                return this.webosMethod("uploadPre",{p1,p2,p3});
+            },
+            fileInfo:function (p1){
+                return this.webosMethod("fileInfo",{p1});
+            },
+            downloadUrl:function (p1){
+                return this.webosMethod("downloadUrl",{p1});
+            },
+            uploadUrl:function (p1,p2,p3){
+                return this.webosMethod("uploadUrl",{p1,p2,p3});
+            },
+            uploadAfter:function (p1,p2,p3){
+                return this.webosMethod("uploadAfter",{p1,p2,p3});
+            },
+            getWpsUrl:function (p1,p2){
+                return this.webosMethod("getWpsUrl",{p1,p2});
+            },
+            uuid:function (){
+                function S4() {
+                    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+                }
+                return S4() + S4() + S4() + S4() + S4() + S4() + S4() + S4();
+            },
+            ext:function (name){
+                if(!name){
+                    name = "";
+                }
+                let sz = name.split(".");
+                if(sz.length>1){
+                    return sz[sz.length-1].toLowerCase();
+                }else{
+                    return "";
+                }
+            },
+            xhrReq:function (method,url,data,progress,headerMap,xhr,responseType){
+                if(!xhr){
+                    xhr = new XMLHttpRequest();
+                }
+                return new Promise(function (success,error){
+                    xhr.open(method, url);
+                    if(responseType){
+                        xhr.responseType = responseType;
+                    }
+                    if(headerMap){
+                        for(let key in headerMap){
+                            let val = headerMap[key];
+                            xhr.setRequestHeader(key,val);
+                        }
+                    }
+                    xhr.addEventListener('loadend', function() {
+                        if(xhr.readyState===4) {
+                            success(xhr);
+                        }
+                    });
+                    xhr.addEventListener('error', function() {
+                        error();
+                    });
+                    xhr.addEventListener('progress', function(evt) {
+                        if(progress){
+                            progress(evt.loaded,evt.total,2);
+                        }
+                    });
+                    xhr.upload.addEventListener('progress', function(evt) {
+                        if(progress){
+                            progress(evt.loaded,evt.total,1);
+                        }
+                    });
+                    try{
+                        xhr.send(data);
+                    }catch (e){
+                        error();
+                    }
+                });
+            },
+            getWpsIdByPath:async function (path,cache){
+                if(cache){
+                    const fileId = await webos.softUserData.syncData("wps_"+path,null,true);
+                    if(fileId && fileId != "1"){
+                        return fileId;
+                    }
+                }
+                return new Promise(async function (success,error){
+                    const file = await fetch(fileUrl).then(function (res){return res.blob()});
+                    fileSize = file.size;
+                    const fileParam = {
+                        status:1,
+                        statusChange:function (res){
+                            if(res.status == 2){
+                                success(res.uploadPreRes.file_id);
+                            }else{
+                                success(false);
+                            }
+                        },
+                        size:file.size,
+                        fpSize:1024*1024*10,
+                        file:file,
+                        path:alipanPath,
+                        filePath:name
+                    }
+                    let fps = Math.floor(fileParam.size/fileParam.fpSize);
+                    if(fileParam.size%fileParam.fpSize != 0){
+                        fps ++;
+                    };
+                    fileParam.needFps = fps;
+                    aliyundriveUpload.upload(fileParam,function (){});
+                });
+            },
+            getWpsUrlByPath:async function (path){
+                const that = this;
+                let fileId = await that.getWpsIdByPath(path,true);
+                if(!fileId){
+                    webos.message.error("文件上传失败,请重试");
+                    return;
+                }
+                let res = await that.getWpsUrl(alipanPath+"/"+fileId,isEdit);
+                if(res.code != 0 || !res.data || res.data.type == 0){
+                    fileId = await that.getWpsIdByPath(path,false);
+                    if(!fileId){
+                        webos.message.error("文件上传失败,请重试");
+                        return;
+                    }
+                    res = await that.getWpsUrl(alipanPath+"/"+fileId,isEdit);
+                    if(res.code != 0 || !res.data || res.data.type == 0){
+                        webos.message.error("获取预览地址失败");
+                        return;
+                    }
+                }
+                webos.softUserData.syncData("wps_"+path,fileId,true);
+                res.data.fileId = fileId;
+                (async function(){
+                   const alInfo = await that.fileInfo(alipanPath+"/"+fileId);
+                   if(fileSize == -1){
+                     const fileInfo = await webos.fileSystem.fileInfo(path);
+                     if(fileInfo){
+                        fileSize = fileInfo.size;
+                     }
+                   }
+                   if(alInfo.data.size != fileSize){
+                      //清理缓存并刷新
+                      webos.softUserData.syncData("wps_"+path,"1",true).then(function(){
+                        window.reload();
+                      });
+                   }
+                })()
+                return res.data;
+            },
+            jsSdkInit:async function (url,token) {
+                const that = this;
+                if(that.jssdk){
+                    await that.jssdk.destroy();
+                }
+                let jssdk = WebOfficeSDK.config({
+                    commonOptions:{
+                        isShowTopArea:true,
+                        isShowHeader:true
+                    },
+                    url: url,
+                    commandBars: [
+                        {
+                            cmbId: 'HeaderLeft',
+                            attributes: {
+                                visible: false,
+                                enable: true,
+                            },
+                        },
+                        {
+                            cmbId: 'HeaderRight',
+                            attributes: {
+                                visible: false,
+                                enable: true,
+                            },
+                        },
+                        {
+                            cmbId: 'ShareLink',
+                            attributes: {
+                                visible: false,
+                                enable: false,
+                            },
+                        },
+                        {
+                            cmbId: 'MobileHeader',
+                            attributes: {
+                                visible: false,
+                                enable: false,
+                            },
+                        }
+                    ],
+                    refreshToken:function(){
+                        return new Promise(async function(success,error){
+                            if(type == 2){
+                                //非阿里云盘
+                                let res = await wpsUtils.getWpsUrl(alipanPath+"/"+wpsData.fileId,isEdit);
+                                if(res.code != 0 || !res.data || res.data.type == 0){
+                                    success({token:res.data.token,timeout:10*60*1000});
+                                }
+                            }else if(type == 3){
+                                //阿里云盘
+                                const tmpData = await parent.webos.fileSystem.wpsUrl(param.get("aliFilePath"),isEdit);
+                                success({token:tmpData.token,timeout:10*60*1000});
+                            }else{
+                                error();
+                            }
+                        });
+                    }
+                });
+                jssdk.on('fileStatus', (v) => {
+                    if(v.status == 7 || v.status == 1 || v.status == 4){
+                        (async function () {
+                            const res = await jssdk.save();
+                            const btn = document.querySelector("#save-btn");
+                            if(res.result == "ok"){
+                                let js = 0;
+                                const time = setInterval(function(){
+                                    if(js%2 == 0){
+                                        btn.className = "side-pane save-ing";
+                                    }else{
+                                        btn.className = "side-pane";
+                                    }
+                                    js++;
+                                },10);
+                                if(type == 1){
+                                    clearInterval(time);
+                                    webos.message.error("文件预览不支持保存");
+                                }else if(type == 2){
+                                    let flag = await wpsUtils.saveFile(wpsData.fileId,path);
+                                    clearInterval(time);
+                                    if(flag){
+                                        btn.className = "side-pane";
+                                    }else{
+                                        btn.className = "side-pane save-error";
+                                    }
+                                }else if(type == 3){
+                                    setTimeout(function(){
+                                        clearInterval(time);
+                                        btn.className = "side-pane";
+                                    },300);
+                                }
+                            }else{
+                                if(res.result){
+                                    var map = {
+                                        "SpaceFull":"账号空间已满",
+                                        "QueneFull":"保存中请勿频繁操作",
+                                        "fail":"保存失败",
+                                        "SavedEmptyFile":"空文件不支持保存"
+                                    }
+                                    if(map[res.result]){
+                                    }
+                                }else{
+                                    webos.message.error("请尝试重新打开文档");
+                                }
+                            }
+                        })();
+                    }
+                });
+                if(token){
+                    jssdk.setToken({
+                        token: token
+                    });
+                }
+                await jssdk.ready();
+                that.jssdk = jssdk;
+            },
+            saveFile:async function (fileId, path) {
+                const res = await wpsUtils.downloadUrl(alipanPath+"/"+fileId);
+                if(res.code != 0){
+                    webos.message.error(res.msg);
+                    return false;
+                }
+                const blob = await fetch(res.data).then(function (res){
+                    return res.blob();
+                });
+                return new Promise(async function (success,error){
+                    var param = {
+                        file:blob,
+                        name:fname,
+                        parentPath:webos.util.getParentPath(path)
+                    }
+                    webos.context.set("showErrMsg",true);
+                    var flag = await webos.fileSystem.uploadSmallFile(param);
+                    if(flag){
+                        success(true);
+                    }else{
+                        success(false);
+                    }
+                });
+            }
+        };
+        if(type == 1 || type == 2){
+            name = wpsUtils.uuid()+"."+wpsUtils.ext(name);
+            wpsData = await wpsUtils.getWpsUrlByPath(path);
+        }else{
+            wpsData = {token:param.get("wpsToken"),url:param.get("wpsUrl")};
+        }
+        if(!isEdit){
+            document.querySelector("#save-btn").style.display = "none";
+        }
+        var isInWebos = function(){
+            try{
+                var p1 = window.parent;
+                var p2 = p1.parent;
+                if(p2.location.pathname.includes("index.html")&&p1!=p2&&p1!=window){
+                    return true;
+                }
+            }catch(e){
+
+            }
+            return false;
+        }
+        if(!isInWebos()){
+            document.querySelector("#link-btn").style.display = "none";
+        }
+        wpsUtils.jsSdkInit(wpsData.url,wpsData.token);
+        window.openExt = function(){
+            var a = document.createElement("a");
+            a.href = window.location.href;
+            a.target = "_blank";
+            a.click();
+        }
+    })()
+</script>
+</html>

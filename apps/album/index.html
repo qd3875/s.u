@@ -1,0 +1,66 @@
+
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>相册系统</title>
+    <script src="js/init.js?from=element&plugins=album"></script>
+    <meta name="referrer" content="never">
+    <style>
+    </style>
+</head>
+<body style="display:none;">
+<div id="app">
+    <div v-if="!noAction.show && !filePreview.url">
+        <el-row class="arrow" style="margin-top:30px;" v-if="firstPath != parentPath">
+            <el-col :span="1">
+                <el-icon @click="toShowLastPath()"><d-arrow-left></d-arrow-left></el-icon>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="24" v-if="!photos || photos.length == 0" style="text-align: center"><div style="padding:10px;">当前相册数据为空</div></el-col>
+            <el-col :xs="6" :sm="4" :md="3" :lg="2" :xl="1" v-for="(item,index) in photos" class="item">
+                <div class="item-com" @click="toShowPhoto(index)">
+                    <div class="image">
+                        <el-image :src="item.thumbnail" fit="contain" :lazy="true"></el-image>
+                    </div>
+                    <div class="item-title">{{item.mainName}}</div>
+                    <div class="item-files-icon" v-if="item.type == 2"><el-icon><files></files></el-icon></div>
+                </div>
+            </el-col>
+        </el-row>
+        <el-image-viewer :hide-on-click-modal="true" @switch="imgSwitch" :initial-index="1" @close="view.show = false" :url-list="['',view.photo,'']" v-if="view.show"></el-image-viewer>
+    </div>
+    <div v-if="!noAction.show && filePreview.url">
+        <el-image-viewer :hide-on-click-modal="true" :initial-index="0" :url-list="[filePreview.url]"></el-image-viewer>
+    </div>
+    <div v-if="noAction.show">
+        <el-row style="margin-left:10px;margin-top:10px;">
+            <el-col :span="24">
+                <el-tag @click="toOpenBySelect()" style="cursor:pointer;margin-left:10px;">打开...</el-tag>
+                <el-tag @click="toOpenBySelect2()" style="cursor:pointer;margin-left:10px;">打开文件夹...</el-tag>
+                <el-tag @click="clearAll()" style="cursor:pointer;margin-left:10px;">清空</el-tag>
+            </el-col>
+            <el-col :span="24" style="margin-top:5px;">
+                <span style="font-size:14px;color:#666;">最近打开</span>
+            </el-col>
+            <el-col :span="24" v-for="item in noAction.history" style="margin-top:10px;">
+                <table @click="toOpenTheFile(item)" style="cursor:pointer;border-spacing:0px;font-size:12px;">
+                    <tr>
+                        <td rowspan="2" style="width:40px;text-align:center;">
+                            <img :src="item.ext=='folder'?'icon.png':item.thumbnail" style="max-width: 40px;max-height: 40px;" alt="" />
+                        </td>
+                        <td style="width:45vw;text-align:left;"><span style="display: inline-block;width: 30vw;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">{{item.name}}</span></td>
+                        <td style="width:calc(55vw - 40px);text-align:left;"><span style="color:#666;">{{item.time}}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><span style="color:#666;display: inline-block;width: 70vw;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">{{item.path}}</span></td>
+                    </tr>
+                </table>
+            </el-col>
+        </el-row>
+    </div>
+</div>
+</body>
+</html>

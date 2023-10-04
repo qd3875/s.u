@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <meta name="referrer" content="never">
+  <script src="./modules/preview/init.js?from=element&plugins=preview"></script>
+  <style>
+    html,body,#app{
+      height:100%;
+      width:100%;
+      margin:0;
+      padding:0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body style="display:none;" data-theme="light" data-sepia="false">
+<div id="app">
+  <el-card v-if="!hasPreview" style="width:100vw;height:100vh;">
+    <template #header>
+      <div style="text-align: center;">
+        <span>当前文件不支持预览</span>
+      </div>
+    </template>
+    <el-row style="text-align: center;">
+      <el-col :span="24" style="margin-top:30px;"><img :src="fileObj.thumbnail" alt="" style="width:100px;object-fit: contain;"></el-col>
+      <el-col :span="24" style="margin-top:30px;">{{fileObj.name}}</el-col>
+      <el-col :span="24" style="margin-top:30px;"><el-button @click="toDownFile(fileObj.download)">下载</el-button></el-col>
+    </el-row>
+  </el-card>
+  <iframe v-if="hasPreview" :src="preViewUrl" frameborder="0" style="width:100vw;height:100vh;border:0px;"></iframe>
+</div>
+</body>
+<script>
+  (function(){
+    Vue.app({
+      data(){
+        return {
+          hasPreview:false,
+          preViewUrl:"",
+          fileObj:{}
+        }
+      },
+      methods:{
+        toDownFile:function (url){
+          const that = this;
+          let a = document.createElement("a");
+          a.href = url;
+          a.target = "_blank";
+          a.download = that.fileObj.name;
+          a.click();
+        },
+        toDownload:async function (url,name,ext){
+          const that = this;
+          that.fileObj.name = name;
+          that.fileObj.ext = ext;
+          that.fileObj.download = url;
+          that.fileObj.type = 1;
+          webos.context.set("defaultFileIcon",await webos.util.defaultFileIcon());
+          await webos.fileSystem.fileIconCalc(that.fileObj);
+          if(!that.fileObj.thumbnail){
+            that.fileObj.thumbnail = "imgs/file_icon/file.png";
+          }
+          document.body.style.display = "";
+        }
+      },
+      mounted:function(){
+        const that = this;
+        utils.delayAction(function (){
+          return window && window.webos ;
+        },async function (){
+          const  searchParams = new URL(window.location.href).searchParams;
+          const url = searchParams.get("url");
+          if(!url){
+            webos.message.error("当前缺少文件url,无法预览");
+            return;
+          }
+          const dUrl = decodeURIComponent(url);
+          const sz = dUrl.split("/");
+          const name = sz[sz.length - 1];
+          const ext = webos.util.getExtByName(name);
+          if(!ext){
+            that.toDownload(url,name,ext);
+            return;
+          }
+          let runUrl = null;
+          if(searchParams.get("code")){
+              runUrl = "apps/"+searchParams.get("code")+"/index.html";
+          }
+          if(!runUrl){
+            const obj = await webos.util.userOpenApp(ext,["open"]);
+            if(obj && obj.url){
+              runUrl = obj.url;
+            }
+          }
+          if(!runUrl){
+            that.toDownload(url,name,ext);
+            return;
+          }
+          let lrc = "";
+          if(searchParams.get("lrc")){
+            lrc="&lrc="+encodeURIComponent(searchParams.get("lrc"));
+          }
+          that.preViewUrl = runUrl+"?url="+encodeURIComponent(url)+lrc;
+          that.hasPreview = true;
+          document.body.style.display = "";
+        });
+      }
+    });
+    utils.documentReady(function(){
+      utils.$.loading("数据加载中....请稍候");
+      utils.delayAction(function(){
+        var iframe = document.querySelector("iframe");
+        return iframe && iframe.contentDocument && iframe.contentDocument.readyState && iframe.contentDocument.readyState == "complete";
+      },function(){
+        utils.$.cancelLoading();
+      },10000);
+    });
+  })();
+</script>
+</html>

@@ -1,0 +1,32 @@
+{
+  "code": "onlyOffice",
+  "name": "OnlyOffice",
+  "version": "1.2.2",
+  "author": "阿范",
+  "firstCat": "app",
+  "secondCat": "文件增强",
+  "imgPath": "apps/onlyOffice/icon.png",
+  "descr": "基于OnlyOffice实现的Office工具",
+  "screenShots": "[]",
+  "effect": "支持文档编辑,支持文档预览",
+  "rightMenuAddAll": [],
+  "rightMenuOpenWith": [
+    {"ext": "doc,docm,docx,docxf,dot,dotm,dotx,fodt,fb2,odt,oform,ott,oxps,pdf,rtf,djvu,xps,csv,fods,ods,ots,xls,xlsb,xlsm,xlsx,xlt,xltm,xltx,fodp,odp,otp,pot,potm,potx,pps,ppsm,ppsx,ppt,pptm,pptx,wps,et,dps","icon": "apps/onlyOffice/icon.png","expAction": "open","name": "OnlyOffice打开"},
+    {"ext": "doc,docm,docx,docxf,dot,dotm,dotx,fodt,fb2,odt,oform,ott,oxps,pdf,rtf,djvu,xps,csv,fods,ods,ots,xls,xlsb,xlsm,xlsx,xlt,xltm,xltx,fodp,odp,otp,pot,potm,potx,pps,ppsm,ppsx,ppt,pptm,pptx,wps,et,dps","icon": "apps/onlyOffice/icon.png","expAction": "edit","name": "OnlyOffice编辑"}
+  ],
+  "rightMenuNew": [
+    {"ext": "doc","icon": "imgs/file_icon/doc.png", "expAction": "new","name": "DOC 文档"},
+    {"ext": "docx","icon": "imgs/file_icon/docx.png","expAction": "new","name": "DOCX 文档"},
+    {"ext": "xls","icon": "imgs/file_icon/xls.png","expAction": "new","name": "XLS 工作表"},
+    {"ext": "xlsx","icon": "imgs/file_icon/xlsx.png","expAction": "new","name": "XLSX 工作表"},
+    {"ext": "ppt","icon": "imgs/file_icon/ppt.png","expAction": "new","name": "PPT 演示文稿"},
+    {"ext": "pptx","icon": "imgs/file_icon/pptx.png","expAction": "new","name": "PPTX 演示文稿"}
+  ],
+  "updateLog":"",
+  "singleton":1,
+  "exts": {
+    "doc,docm,docx,docxf,dot,dotm,dotx,fodt,fb2,odt,oform,ott,oxps,rtf,djvu,xml,xps,wps":"apps/onlyOffice/imgs/doc.png",
+    "csv,fods,ods,ots,xls,xlsb,xlsm,xlsx,xlt,xltm,xltx,et":"apps/onlyOffice/imgs/xls.png",
+    "fodp,odp,otp,pot,potm,potx,pps,ppsm,ppsx,ppt,pptm,pptx,dps":"apps/onlyOffice/imgs/ppt.png"
+  }
+}

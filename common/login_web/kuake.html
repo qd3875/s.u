@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>夸克网盘</title>
+    <script src="../smart-ui/boot/utils.js?from=element"></script>
+    <style>
+    </style>
+</head>
+<body>
+<div style="text-align: center;margin-top: 10px;">请使用夸克APP扫码登录</div>
+<div id="qrcode-div" style="padding-left: calc(50vw - 128px);padding-top: 10px;"></div>
+</body>
+<script>
+    (async function (){
+        const cookieMap = {};
+        let tmpUtil = {
+            getCookieStrByMap:function (mapData){
+                let str = "";
+                for(let key in mapData){
+                    str += key+"="+mapData[key]+";";
+                }
+                return str;
+            },
+            getCookieStr:function (xhr,name){
+                let tmp = xhr.getResponseHeader(name);
+                let cookies = tmp.split(";");
+                //let fields = ["_UP_28A_52_","_UP_BT_","_UP_F7E_8D_","_UP_6D1_64_","_UP_A4A_11_","_UP_D_","b-user-id","b-user-id.sig","omelette-vid","omelette-vid.sig"];
+                let fields = ["__uid=","__ktd=","__kps=","__kp=","__pus=","__ptu_fix=","__ptu=","ctoken="];
+                let str = "";
+                for (let i = 0; i < cookies.length; i++) {
+                    let cookie = cookies[i];
+                    let field = null;
+                    for (let j = 0; j < fields.length; j++) {
+                        if(cookie.indexOf(fields[j]) != -1){
+                            field = fields[j];
+                            break;
+                        }
+                    }
+                    if(!field){
+                        continue;
+                    }
+                    let sz = cookie.split(",");
+                    for (let j = 0; j < sz.length; j++) {
+                        if(sz[j].indexOf(field) != -1){
+                            cookie = sz[j].trim();
+                            break;
+                        }
+                    }
+                    str += ";"+cookie;
+                }
+                return str.substring(1);
+            },
+            getCookieMap:function (xhr,name){
+                let tmp = xhr.getResponseHeader(name);
+                let cookies = tmp.split(";");
+                let fields = ["ctoken="];
+                let tmpMap = {};
+                for (let i = 0; i < cookies.length; i++) {
+                    let cookie = cookies[i];
+                    let field = null;
+                    if(cookie.indexOf("_") != -1 && cookie.indexOf("=") != -1){
+
+                    }else if(cookie.indexOf("-") != -1 && cookie.indexOf("=") != -1){
+
+                    }else{
+                        for (let j = 0; j < fields.length; j++) {
+                            if(cookie.indexOf(fields[j]) != -1){
+                                field = fields[j];
+                                break;
+                            }
+                        }
+                        if(!field){
+                            continue;
+                        }
+                    }
+                    let sz = cookie.split(",");
+                    for (let j = 0; j < sz.length; j++) {
+                        let tmpStr = sz[j];
+                        if(field){
+                            if(tmpStr.indexOf(field) != -1){
+                                cookie = tmpStr.trim();
+                                break;
+                            }
+                        }else if(tmpStr.indexOf("_") != -1 && tmpStr.indexOf("=") != -1){
+                            cookie = tmpStr.trim();
+                            break;
+                        }else if(tmpStr.indexOf("-") != -1 && tmpStr.indexOf("=") != -1){
+                            cookie = tmpStr.trim();
+                            break;
+                        }
+                    }
+                    sz = cookie.split("=");
+                    let key = sz[0].trim();
+                    if(key.toLowerCase().indexOf("max-age") != -1){
+                        continue;
+                    }
+                    sz.splice(0,1);
+                    let val = sz.join("=").trim();
+                    tmpMap[key] = val;
+                }
+                return tmpMap;
+            }
+        }
+        let data = new parent.FormData();
+        data.append("client_id","386");
+        data.append("v","1.2");
+        data.append("request_id",""+Date.now());
+        let xhr = await parent.webos.request.proxy(
+            "https://uop.quark.cn/cas/ajax/getTokenForQrcodeLogin?__t="+Date.now(),
+            "POST",
+            {
+                "referer":"https://broccoli.uc.cn/",
+                "content-type":"application/x-www-form-urlencoded",
+            "user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.63"},
+            data,
+            null,
+            {"set-cookie":"my-set-cookie"}
+        );
+        if(xhr.status != 200){
+            parent.webos.message.error("获取请求失败,请重试");
+            return;
+        }
+        let res = JSON.parse(xhr.responseText);
+        if(res.status != 2000000){
+            parent.webos.message.error("获取请求失败,请重试");
+            return;
+        }
+        let tmpCookieMap = tmpUtil.getCookieMap(xhr,"my-set-cookie");
+        for(let key in tmpCookieMap){
+            cookieMap[key] = tmpCookieMap[key];
+        }
+        let token = res.data.members.token;
+        let qrcode = "https://t.uc.cn/8_au5on?uc_param_str=&token="+token+"&client_id=386&uc_biz_str=S%3Acustom%7COPT%3ASAREA%400%7COPT%3AIMMERSIVE%401%7COPT%3ABACK_BTN_STYLE%400";
+        parent.webos.util.toQrcode(qrcode,document.getElementById("qrcode-div"));
+        const timeId = setInterval(async function (){
+            data = new parent.FormData();
+            data.append("client_id","386");
+            data.append("v","1.2");
+            data.append("request_id",""+Date.now());
+            data.append("token",token);
+            let xhr2 = await parent.webos.request.proxy(
+                "https://uop.quark.cn/cas/ajax/getServiceTicketByQrcodeToken?__t="+Date.now(),
+                "POST",
+                {
+                    "referer":"https://broccoli.uc.cn/",
+                    "content-type":"application/x-www-form-urlencoded",
+                    "user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.63"},
+                data,
+                null,
+                {"set-cookie":"my-set-cookie"}
+            );
+            try{
+                let res = JSON.parse(xhr2.responseText);
+                let tmpCookieMap = tmpUtil.getCookieMap(xhr2,"my-set-cookie");
+                for(let key in tmpCookieMap){
+                    cookieMap[key] = tmpCookieMap[key];
+                }
+                if(res.status == 2000000){
+                    clearInterval(timeId);
+                    let service_ticket = res.data.members.service_ticket;
+                    //url,method,headerMap,data,cdx,resHeaderMap,progress,responseType
+                    xhr2 = await parent.webos.request.proxy("https://pan.quark.cn/account/info?st="+service_ticket,"GET",
+                        {},null,null,
+                        {"set-cookie":"my-set-cookie"}
+                    );
+                    res = JSON.parse(xhr2.responseText);
+                    if(res.success) {
+                        let tmpCookieMap = tmpUtil.getCookieMap(xhr2,"my-set-cookie");
+                        for(let key in tmpCookieMap){
+                            cookieMap[key] = tmpCookieMap[key];
+                        }
+                        let cookieStr = tmpUtil.getCookieStrByMap(cookieMap);
+                        parent.postMessage({type:"cookie",data:cookieStr},"*");
+                    }
+                }
+            }catch (e){
+            }
+        },1000);
+    })();
+</script>
+</html>
